@@ -40,10 +40,35 @@ namespace SCSSdkClient.Object {
         /// Aproximated for entire truck, not at the wheel level.
       
         /// <summary>
-        ///     Timestamp not the in game time,
+        ///     Is the sdk active (only reset when game is closed correct, crashes or kills won't set this value)
+        /// </summary> 
+        public bool SdkActive { get; internal set; }
+
+        /// <summary>
+        ///      Similar to simulation time however it stops
+        ///      when the physics simulation is paused.
+        ///      Is not reseted.
         /// </summary>
         /// <seealso cref="Common.GameTime" />
-        public uint Timestamp { get; internal set; }
+        /// <seealso cref="SimulationTimestamp" />
+        public ulong Timestamp { get; internal set; }
+
+        /// <summary>
+        ///     Time controlling the physical simulation.
+        ///
+        ///     Usually changes with fixed size steps so it oscilates
+        ///     around the render time. This value changes even if the
+        ///     physics simulation is currently paused.
+        /// </summary>
+        /// <seealso cref="RenderTimestamp" />
+        public ulong SimulationTimestamp { get; internal set; }
+
+        /// <summary>
+        ///     Time controlling the visualization.
+        ///
+        ///     Its step changes depending on rendering FPS.
+        /// </summary>
+        public ulong RenderTimestamp { get; internal set; }
 
         /// <summary>
         ///     Is the game actual paused? (Menu, F1, Map, etc. open)

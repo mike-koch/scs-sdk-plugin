@@ -5,26 +5,26 @@
 #include "scs-telemetry-common.hpp"
 #include "sharedmemory.hpp"
 
-#include "log.hpp"
+#include "log.hpp" 
 
 extern SharedMemory* telem_mem;
 extern scsTelemetryMap_t* telem_ptr;
 #pragma region scsConfigHandler_t[]
 
 // const: substances_config
-// handle config id `substances`
+// all handles with config id `substances`
 const scsConfigHandler_t substances_config[] = {
     {SCS_TELEMETRY_CONFIG_ATTRIBUTE_id, handleSubstancesId}
 };
 
 // const: controls_config
-// handle config id `controls`
+// all handles with config id `controls`
 const scsConfigHandler_t controls_config[] = {
     {SCS_TELEMETRY_CONFIG_ATTRIBUTE_shifter_type, handleControlsShifterType}
 };
 
 // const: hshifter_config
-// handle config id `hshifter`
+// all handles with config id `hshifter`
 const scsConfigHandler_t hshifter_config[] = {
         {SCS_TELEMETRY_CONFIG_ATTRIBUTE_selector_count, handleHShifterSelectorCount},
         {SCS_TELEMETRY_CONFIG_ATTRIBUTE_slot_gear, handleHShifterResulting},
@@ -33,7 +33,7 @@ const scsConfigHandler_t hshifter_config[] = {
 };
 
 // const: truck_config
-// handle config id `truck` 
+// all handles with config id `truck` 
 const scsConfigHandler_t truck_config[] = {
         {SCS_TELEMETRY_CONFIG_ATTRIBUTE_brand_id, handleTruckBrandId},
         {SCS_TELEMETRY_CONFIG_ATTRIBUTE_brand, handleTruckBrand},
@@ -71,7 +71,7 @@ const scsConfigHandler_t truck_config[] = {
 };
 
 // const: trailer_config
-// handle config id `trailer`
+// all handles with config id `trailer`
 const scsConfigHandler_t trailer_config[] = {
         {SCS_TELEMETRY_CONFIG_ATTRIBUTE_id, handleTrailerId},
         {SCS_TELEMETRY_CONFIG_ATTRIBUTE_cargo_accessory_id, handleTrailerCargoAccessoryId},
@@ -94,7 +94,7 @@ const scsConfigHandler_t trailer_config[] = {
 };
 
 // const: job_config
-// handle config id `job`
+// all handles with config id `job`
 const scsConfigHandler_t job_config[] = {
         {SCS_TELEMETRY_CONFIG_ATTRIBUTE_cargo_id, handleJobCargoId},
         {SCS_TELEMETRY_CONFIG_ATTRIBUTE_cargo, handleJobCargo},
@@ -113,9 +113,12 @@ const scsConfigHandler_t job_config[] = {
         {SCS_TELEMETRY_CONFIG_ATTRIBUTE_job_market, handleJobJobMarket},
         {SCS_TELEMETRY_CONFIG_ATTRIBUTE_special_job, handleJobSpecialJob},
         {SCS_TELEMETRY_CONFIG_ATTRIBUTE_cargo_unit_count, handleJobUnitCount},
-        {SCS_TELEMETRY_CONFIG_ATTRIBUTE_cargo_unit_mass, handleJobUnitMass}
+        {SCS_TELEMETRY_CONFIG_ATTRIBUTE_cargo_unit_mass, handleJobUnitMass},
+        {SCS_TELEMETRY_CONFIG_ATTRIBUTE_planned_distance_km, handleJobPlannedDistanceKm}
 };
 
+// const: length_configs
+// contains the length of the handle config arrays
 const int length_configs[] = {
     sizeof substances_config / sizeof*substances_config,
     sizeof controls_config / sizeof*controls_config,
@@ -127,8 +130,22 @@ const int length_configs[] = {
 #pragma endregion Contains all handler arrays
 
 
-// Function: handleCfg
-// brings the config attributes to the correct function
+/* Function: handleCfg
+  
+    call the correct handle of the scs_config event
+
+    Parameters:
+
+        info - scs_config event value + name
+        type - type (id) of the scs_config event, <configType> 
+        trailer_id - trailer id if needed to handle the event (0-9)
+
+    Returns:
+    
+        true if event was handled
+
+
+*/
 bool handleCfg(const scs_named_value_t* info, const configType type, const unsigned int trailer_id) {
     const scsConfigHandler_t* configs = nullptr;
     switch (type) {
@@ -151,40 +168,37 @@ bool handleCfg(const scs_named_value_t* info, const configType type, const unsig
         configs = job_config;
         break;
     default:
-        // something went wrong
-        ;
+        return false;
     }
-    auto i = configs;
+    
     for (auto index = 0; index < length_configs[type]; index++) {
-        if (strcmp(i->id, info->name) == 0) {
+        if (strcmp(configs->id, info->name) == 0) {
             if (telem_ptr) {
                 // Equal ID's; then handle this configuration
-                if (i->handle)
+                if (configs->handle)
                     // TODO: FIND A BETTER WAY TO HANDLE THE TRAILER ID
-                    i->handle(info, trailer_id);
+                    configs->handle(info, trailer_id);
             }
             return true;
         }
-        ++i;
+        ++configs;
     }
     return false;
 }
 
 #pragma region handleSubstances
-// Function: handleSubstancesId
-// handle the Substances Id and write it to the memory
-// It write up to <SUBSTANCE_SIZE> substances into the memory
+/* Function: handleSubstancesId
+    
+    Handle the Substances Id and write it to the space in memory.
+    It write up to <SUBSTANCE_SIZE> substances into the memory
+
+	See Also:
+
+        <scsConfigHandle>
+*/
 scsConfigHandle(Substances, Id) {
     if (current->index < SUBSTANCE_SIZE) {
-#if LOGGING
-		logger::out << "Substance log" << '\n';
-		logger::out << "current value of that substance " <<  telem_ptr->substances.substance[current->index] << '\n';
-#endif
         strncpy(telem_ptr->substances.substance[current->index], current->value.value_string.value, stringsize);
-#if LOGGING
-		logger::out << "new value of that substance " <<  telem_ptr->substances.substance[current->index] << '\n';
-		logger::out << "field value of that substance " << current->value.value_string.value << '\n';
-#endif
     }
 }
 
@@ -206,6 +220,8 @@ scsConfigHandle(HShifter, SelectorCount) {
     telem_ptr->config_ui.selectorCount = current->value.value_u32.value;
 }
 
+// Function: handeHShifterResulting
+// handle the HSifter Resulting and write it to the memory
 scsConfigHandle(HShifter, Resulting) {
     const auto gear = current->index;
     const auto value = current->value.value_s32.value;
@@ -605,5 +621,9 @@ scsConfigHandle(Job, UnitCount) {
 
 scsConfigHandle(Job, UnitMass) {
     telem_ptr->config_f.unitMass = current->value.value_float.value;
+}
+
+scsConfigHandle(Job,PlannedDistanceKm) { 
+    telem_ptr->config_ui.plannedDistanceKm = current->value.value_u32.value;
 }
 #pragma endregion All handler of the id job

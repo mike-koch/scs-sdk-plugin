@@ -322,7 +322,13 @@ void log_events(const scs_telemetry_gameplay_event_t* info) {
  * @brief Last timestamp we received.
  */
 scs_timestamp_t last_timestamp = static_cast<scs_timestamp_t>(-1);
+scs_timestamp_t last_simulatedtimestamp = static_cast<scs_timestamp_t>(-1);
+scs_timestamp_t last_rendertimestamp = static_cast<scs_timestamp_t>(-1);
+
 scs_timestamp_t timestamp;
+scs_timestamp_t simulatedtimestamp;
+scs_timestamp_t rendertimestamp;
+
 static auto clear_job_ticker = 0;
 static auto clear_cancelled_ticker = 0;
 static auto clear_delivered_ticker = 0;
@@ -330,6 +336,8 @@ static auto clear_fined_ticker = 0;
 static auto clear_tollgate_ticker = 0;
 static auto clear_ferry_ticker = 0;
 static auto clear_train_ticker = 0;
+static auto clear_refuel_payed_ticker = 0;
+
 
 //TODO: REWORK BOTH CLEAN FUNCTION AND ADD MORE FOR SINGLE CONFIG attribute
 // Function: set_job_values_zero
@@ -342,7 +350,7 @@ void set_job_values_zero() {
     telem_ptr->config_f.unitMass = 0;
     telem_ptr->job_f.cargoDamage = 0;
     telem_ptr->config_b.isCargoLoaded = false;
-    telem_ptr->config_b.isCargoLoaded = false;
+    telem_ptr->config_ui.plannedDistanceKm = 0;
     memset(telem_ptr->config_s.compDstId, 0, stringsize);
     memset(telem_ptr->config_s.compSrcId, 0, stringsize);
     memset(telem_ptr->config_s.cityDstId, 0, stringsize);
@@ -363,6 +371,16 @@ void set_trailer_values_zero(unsigned int trailer_id = 0) {
     new(&telem_ptr->trailer.trailer[trailer_id]) scsTrailer_t();
 }
 
+
+// Last Fuel Value (set to a high value to avoid to trigger the event directly on start)
+static auto fuel_ticker = 0;
+static auto fuel_ticker2 = 0;
+static auto last_fuel_value = 0.0f;
+static auto current_fuel_value = 0.0f;
+static auto refuel = false;
+static auto fuel_tmp = 0.0f;
+static auto start_fuel = 0.0f;
+
 // Function: telemetry_frame_start
 // Register telemetry values
 SCSAPI_VOID telemetry_frame_start(const scs_event_t UNUSED(event), const void* const event_info,
@@ -378,50 +396,128 @@ SCSAPI_VOID telemetry_frame_start(const scs_event_t UNUSED(event), const void* c
     if (last_timestamp == static_cast<scs_timestamp_t>(-1)) {
         last_timestamp = info->paused_simulation_time;
     }
+    if (last_simulatedtimestamp == static_cast<scs_timestamp_t>(-1)) {
+        last_simulatedtimestamp = info->simulation_time;
+    }
+    if (last_rendertimestamp == static_cast<scs_timestamp_t>(-1)) {
+        last_rendertimestamp = info->render_time;
+    }
 
     // The timer might be sometimes restarted (e.g. after load) while
     // we want to provide continuous time on our output.
 
-    if (info->flags & SCS_TELEMETRY_FRAME_START_FLAG_timer_restart) {
+    if (info->flags & SCS_TELEMETRY_FRAME_START_FLAG_timer_restart) { 
         last_timestamp = 0;
+        last_simulatedtimestamp = 0;
+        last_rendertimestamp = 0;
     }
 
     // Advance the timestamp by delta since last frame.
 
     timestamp += info->paused_simulation_time - last_timestamp;
+    simulatedtimestamp += info->simulation_time - last_simulatedtimestamp;
+    rendertimestamp += info->render_time - last_rendertimestamp;
     last_timestamp = info->paused_simulation_time;
+    last_simulatedtimestamp = info->simulation_time;
+    last_rendertimestamp = info->render_time;
 
     /* Copy over the game timestamp to our telemetry memory */
     if (telem_ptr != nullptr) {
-        telem_ptr->time = static_cast<unsigned int>(timestamp);
+        telem_ptr->time = static_cast<unsigned long long>(timestamp);
+        telem_ptr->simulatedTime = static_cast<unsigned long long>(simulatedtimestamp);
+        telem_ptr->renderTime = static_cast<unsigned long long>(rendertimestamp);
 
         // Do a non-convential periodic update of this field:
         telem_ptr->truck_b.cruiseControl = telem_ptr->truck_f.cruiseControlSpeed > 0;
 
+        // check fuel value
+        current_fuel_value = telem_ptr->truck_f.fuel;
+ 
+        if(!refuel) {
+            start_fuel = fuel_tmp;
+            fuel_tmp = telem_ptr->truck_f.fuel;
+        }
+        if (current_fuel_value > last_fuel_value && last_fuel_value > 0) {
+            fuel_ticker2 = 0;
+            telem_ptr->special_b.refuel = true;
+            if(!refuel) {                
+                refuel = true;
+                clear_refuel_payed_ticker = 0;               
+                
+            }
+        }else if (current_fuel_value < last_fuel_value) {
+            fuel_ticker2 = 0;
+            telem_ptr->special_b.refuel = false;
+        }
+
+        // refuel is true, but engine is now active? than refuel is finished and payed, fire event   
+        if(refuel && telem_ptr->truck_b.engineEnabled) {
+            refuel = false;
+                     
+            telem_ptr->gameplay_f.refuelAmount = telem_ptr->truck_f.fuel - start_fuel;
+            telem_ptr->special_b.refuelPayed = true;
+            
+        }
+
+        // update last value every few ticks (refuel rate is not constant and the plugin side did check every 25 ms so to try a
+        // constant refuel event for the whole time a few strange things :D atm
+        if (fuel_ticker > 10) {
+            fuel_ticker = 0;
+
+            if (current_fuel_value == last_fuel_value) {
+                fuel_ticker2++;
+            }
+            else {
+                fuel_ticker2 = 0;
+            }
+            if (fuel_ticker2 >= 5) {
+                fuel_ticker2 = 0;
+                telem_ptr->special_b.refuel = false;
+            }
+           
+        }
+        fuel_ticker++;
+        last_fuel_value = current_fuel_value;
+       
+         
         //TODO: better way for that mess here
         if (telem_ptr->special_b.jobFinished) {
             clear_job_ticker++;
 
-            if (clear_job_ticker > 10) {
-                set_job_values_zero();
-                telem_ptr->special_b.jobFinished = false;
+            if (telem_ptr->special_b.jobCancelled) {
+                clear_cancelled_ticker++;
+
+                if (clear_cancelled_ticker > 10) {
+                    set_job_values_zero();
+                    telem_ptr->special_b.jobCancelled = false;
+                    telem_ptr->special_b.jobFinished = false;
+                }
+            }
+            else if (telem_ptr->special_b.jobDelivered) {
+                clear_delivered_ticker++;
+
+                if (clear_delivered_ticker > 10) {
+                    set_job_values_zero();
+                    telem_ptr->special_b.jobDelivered = false;
+                    telem_ptr->special_b.jobFinished = false;
+                }
+            }
+            else {
+                // job is cancelled -> user input
+                // job is delivered -> user
+                // this case ? seems to be called the first time the user leaves the profile
+                // else there should no case (i hope and think atm so)
+                 if (clear_job_ticker > 10) {
+                    set_job_values_zero(); 
+                    telem_ptr->special_b.jobFinished = false;
+                }
             }
         }
+        if (telem_ptr->special_b.refuelPayed) {
+            clear_refuel_payed_ticker++;
 
-        if (telem_ptr->special_b.jobCancelled) {
-            clear_cancelled_ticker++;
-
-            if (clear_cancelled_ticker > 10) {
-                set_job_values_zero();
-                telem_ptr->special_b.jobCancelled = false;
-            }
-        }
-        if (telem_ptr->special_b.jobDelivered) {
-            clear_delivered_ticker++;
-
-            if (clear_delivered_ticker > 10) {
-                set_job_values_zero();
-                telem_ptr->special_b.jobDelivered = false;
+            if (clear_refuel_payed_ticker > 10) {
+                telem_ptr->special_b.refuelPayed = false;
             }
         }
         if (telem_ptr->special_b.fined) {
@@ -482,12 +578,21 @@ SCSAPI_VOID telemetry_gameplay(const scs_event_t event, const void* const event_
     if (strcmp(info->id, SCS_TELEMETRY_GAMEPLAY_EVENT_job_cancelled) == 0) {
         type = cancelled;
         telem_ptr->special_b.jobCancelled = true;
+        telem_ptr->gameplay_ui.jobFinishedTime = telem_ptr->common_ui.time_abs;
         clear_cancelled_ticker = 0;
+        telem_ptr->special_b.onJob = false;
+        telem_ptr->special_b.jobFinished = true;
+        clear_job_ticker = 0;
     }
     else if (strcmp(info->id, SCS_TELEMETRY_GAMEPLAY_EVENT_job_delivered) == 0) {
         type = delivered;
         telem_ptr->special_b.jobDelivered = true;
+        telem_ptr->gameplay_ui.jobFinishedTime = telem_ptr->common_ui.time_abs;
         clear_delivered_ticker = 0;
+        telem_ptr->special_b.onJob = false;
+        telem_ptr->special_b.jobFinished = true;
+        clear_job_ticker = 0;
+
     }
     else if (strcmp(info->id, SCS_TELEMETRY_GAMEPLAY_EVENT_player_fined) == 0) {
         type = fined;
@@ -537,7 +642,7 @@ SCSAPI_VOID telemetry_configuration(const scs_event_t event, const void* const e
                                     scs_context_t UNUSED(context)) {
     // On configuration change, this function is called.
     const auto info = static_cast<const scs_telemetry_configuration_t *>(
-        // TODO: DELETE ENTRYS WHEN CALLED SO NO VALUE IS THERE to avoid wrong values when changes accour but not in arrays up to that slot or so 
+        // TODO: DELETE ENTRIES WHEN CALLED SO NO VALUE IS THERE to avoid wrong values when changes occur but not in arrays up to that slot or so 
         event_info);
     unsigned int trailer_id = NULL;
     // check which type the event has
@@ -593,7 +698,7 @@ SCSAPI_VOID telemetry_configuration(const scs_event_t event, const void* const e
     }
 
     // uncomment to log every config, should work but with function not tested ^^`
-    //log_configs(info); 
+    // log_configs(info); 
 
     // attribute is a pointer array that is never null so ... i have no clue how to check it on another way than this
     // if for loop can't loop it is empty so simple 
@@ -607,7 +712,7 @@ SCSAPI_VOID telemetry_configuration(const scs_event_t event, const void* const e
         is_empty = false;
     }
     // if id of config is "job" but without element and we are on a job -> we finished it now
-    if (type == job && is_empty && telem_ptr->special_b.onJob) {
+    if (type == job && is_empty && telem_ptr->special_b.onJob) { 
         telem_ptr->special_b.onJob = false;
         telem_ptr->special_b.jobFinished = true;
         clear_job_ticker = 0;
@@ -615,6 +720,7 @@ SCSAPI_VOID telemetry_configuration(const scs_event_t event, const void* const e
     else if (!telem_ptr->special_b.onJob && type == job && !is_empty) {
         // oh hey no job but now we have fields in this array so we start a new job
         telem_ptr->special_b.onJob = true;
+        telem_ptr->gameplay_ui.jobStartingTime = telem_ptr->common_ui.time_abs;
     }
 
 }
@@ -762,8 +868,8 @@ SCSAPI_RESULT scs_telemetry_init(const scs_u32_t version, const scs_telemetry_in
         return SCS_RESULT_generic_error;
     }
 
-    memset(telem_ptr, 0, SCS_PLUGIN_MMF_SIZE);
-
+    // set sdk active bit to true
+    telem_ptr->sdkActive = true;
     /*** INITIALIZE TELEMETRY MAP TO DEFAULT ***/
     telem_ptr->paused = true;
     telem_ptr->time = 0;
@@ -1043,6 +1149,20 @@ SCSAPI_VOID scs_telemetry_shutdown() {
 	logger::flush();
 #endif
     // Close MemoryMap
+    telem_ptr->sdkActive = false;
+    telem_ptr->scs_values.game = 0;
+    telem_ptr->scs_values.telemetry_plugin_revision = 0;
+    telem_ptr->scs_values.telemetry_version_game_major = 0;
+    telem_ptr->scs_values.telemetry_version_game_minor = 0;
+    telem_ptr->scs_values.version_major = 0;
+    telem_ptr->scs_values.version_minor = 0;
+
+    telem_ptr->time = 0;
+    telem_ptr->simulatedTime = 0;
+    telem_ptr->renderTime = 0;
+    telem_ptr->common_ui.time_abs = 0;
+    telem_ptr->common_f.scale = 0;
+
     if (telem_mem != nullptr) {
         telem_mem->Close();
     }

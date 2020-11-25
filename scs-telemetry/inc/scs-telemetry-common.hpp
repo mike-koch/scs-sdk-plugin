@@ -22,7 +22,7 @@
 #endif
 
 #include "scssdk.h"
-#define SCS_PLUGIN_MMF_NAME TEXT("Local\\SimTelemetrySCS")
+#define SCS_PLUGIN_MMF_NAME TEXT("Local\\SCSTelemetry")
 #define SCS_PLUGIN_MMF_SIZE (32*1024)
 /**
  * \brief string size for all strings (most of them) the amount of fields in the shared memory field
@@ -43,6 +43,8 @@ bool check_max_version(unsigned const int min_ets2, unsigned const int min_ats);
 enum configType { substances, controls, hshifter, truck, trailer, job };
 enum gameplayType { cancelled, delivered, fined, tollgate, ferry, train };
 void log_line(scs_log_type_t type, const char* text, ...);
+void log_line(const char* text, ...);
+
 typedef struct scsTrailer_s { // Size: 1528
 	//----- START OF FIRST ZONE AT OFFSET 0 -----//
 	struct {
@@ -145,15 +147,22 @@ typedef struct scsTelemetryMap_s
 {
 	//----- START OF FIRST ZONE AT OFFSET 0 -----//
 	// Staring with values needed to handle the data
-	// not the game time, only a timestamp. Used to update the values on the other site of the shared memory
-	unsigned int time;
-	// check if the game and the telemetry is paused
+	// display if game / sdk runs
+	bool sdkActive;
+	char placeHolder[3];
+    // check if the game and the telemetry is paused
 	bool paused;
+	char placeHolder2[3];
+
+	// not the game time, only a timestamp. Used to update the values on the other site of the shared memory
+	unsigned long long time;	
+    unsigned long long simulatedTime;
+    unsigned long long renderTime;
 
 	// to make a buffer for changes here and avoid errors later we create a empty room so we fill the first 40 fields, shrink it when you add something above here
-	char buffer[35];
+	char buffer[8];
 
-	//----- END OF FIRST ZONE AT OFFSET 39 -----//
+	//----- END OF FIRST ZONE AT OFFSET 39 -----//in
 
 	//----- START OF SECOND ZONE AT OFFSET 40 -----//
 	// The Secon zone contains unsigned integers and it sorted in sub structures
@@ -191,6 +200,7 @@ typedef struct scsTelemetryMap_s
 		unsigned int time_abs_delivery;
 		unsigned int maxTrailerCount;
 		unsigned int unitCount;
+        unsigned int plannedDistanceKm;
 	}config_ui;
 
 	// Contains trailer/truck channel unsigned integers
@@ -206,8 +216,10 @@ typedef struct scsTelemetryMap_s
 
 	struct {
 		unsigned int jobDeliveredDeliveryTime;
+        unsigned int jobStartingTime;
+        unsigned int jobFinishedTime; 
 	}gameplay_ui;
-	char buffer_ui[60];
+	char buffer_ui[48];
 	//----- END OF SECOND ZONE AT OFFSET 499 -----//
 
 	//----- START OF Third ZONE AT OFFSET 500 -----//
@@ -299,12 +311,13 @@ typedef struct scsTelemetryMap_s
 	struct {
 		float jobDeliveredCargoDamage;
 		float jobDeliveredDistanceKm;
+        float refuelAmount;
 	}gameplay_f;
 
 	struct {
 		float cargoDamage;
 	}job_f;
-	char buffer_f[32];
+	char buffer_f[28];
 	//----- END OF FOURTH ZONE AT OFFSET 1499 -----//
 
 	//----- START OF FIFTH ZONE AT OFFSET 1500 -----//
@@ -458,7 +471,7 @@ typedef struct scsTelemetryMap_s
 		char jobMarket[32];
 	}config_s;
 	struct {
-		char fineOffence[16];
+		char fineOffence[32];
 		char ferrySourceName[stringsize];
 		char ferryTargetName[stringsize];
 		char ferrySourceId[stringsize];
@@ -469,7 +482,7 @@ typedef struct scsTelemetryMap_s
 		char trainTargetId[stringsize];
 	}gameplay_s;
 
-	char buffer_s[36];
+	char buffer_s[20];
 	//----- END OF 9TH ZONE AT OFFSET 3999 -----//
 
 	//----- START OF 10TH ZONE AT OFFSET 4000 -----//
@@ -500,18 +513,18 @@ typedef struct scsTelemetryMap_s
 
 	struct {
 		bool onJob;
-		bool jobFinished;
-	
- 
+		bool jobFinished; 
 		bool jobCancelled;
 		bool jobDelivered;
 		bool fined;
 		bool tollgate;
 		bool ferry;
 		bool train;
+		bool refuel;
+		bool refuelPayed;
 	}special_b;
 
-	char buffer_special[92];
+	char buffer_special[90];
 	//----- END OF 12TH ZONE AT OFFSET 4399 -----//
 
 	//----- START OF 13TH ZONE AT OFFSET 4400 -----//

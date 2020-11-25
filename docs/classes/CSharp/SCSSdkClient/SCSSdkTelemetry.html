@@ -8,204 +8,224 @@
 
 <body onload="NDLoader.OnLoad('Content');" class="NDPage NDContentPage">
 
-<a name="Topic52"></a><div class="CTopic TClass LCSharp first">
+<a name="Topic570"></a><div class="CTopic TClass LCSharp first">
  <div class="CTitle"><span class="Qualifier">SCSSdkClient.</span>&#8203;SCSSdkTelemetry</div>
- <div class="NDClassPrototype HasParents" id="NDClassPrototype52"><div class="CPEntry Parent TClass"><div class="CPName">IDisposable</div></div><div class="CPEntry TClass Current"><div class="CPModifiers"><span class="SHKeyword">public</span></div><div class="CPName"><span class="Qualifier">SCSSdkClient.</span>&#8203;SCSSdkTelemetry</div></div></div>
+ <div class="NDClassPrototype HasParents" id="NDClassPrototype570"><div class="CPEntry Parent TClass"><div class="CPName">IDisposable</div></div><div class="CPEntry TClass Current"><div class="CPModifiers"><span class="SHKeyword">public</span></div><div class="CPName"><span class="Qualifier">SCSSdkClient.</span>&#8203;SCSSdkTelemetry</div></div></div>
  <div class="CBody"><p>Handle the SCSSdkTelemetry.&nbsp; Currently IDisposable. Was implemented because of an error</p></div>
 </div>
 
-<a name="Constants"></a><a name="Topic143"></a><div class="CTopic TGroup LCSharp">
+<a name="Constants"></a><a name="Topic571"></a><div class="CTopic TGroup LCSharp">
  <div class="CTitle">Constants</div>
 </div>
 
-<a name="DefaultSharedMemoryMap"></a><a name="Topic144"></a><div class="CTopic TConstant LCSharp">
+<a name="DefaultSharedMemoryMap"></a><a name="Topic572"></a><div class="CTopic TConstant LCSharp">
  <div class="CTitle">DefaultSharedMemoryMap</div>
- <div id="NDPrototype144" class="NDPrototype NoParameterForm"><span class="SHKeyword">private const</span> <span class="SHKeyword">string</span> DefaultSharedMemoryMap</div>
+ <div id="NDPrototype572" class="NDPrototype NoParameterForm"><span class="SHKeyword">private const</span> <span class="SHKeyword">string</span> DefaultSharedMemoryMap</div>
 </div>
 
-<a name="DefaultUpdateInterval"></a><a name="Topic145"></a><div class="CTopic TConstant LCSharp">
+<a name="DefaultUpdateInterval"></a><a name="Topic573"></a><div class="CTopic TConstant LCSharp">
  <div class="CTitle">DefaultUpdateInterval</div>
- <div id="NDPrototype145" class="NDPrototype NoParameterForm"><span class="SHKeyword">private const</span> <span class="SHKeyword">int</span> DefaultUpdateInterval</div>
+ <div id="NDPrototype573" class="NDPrototype NoParameterForm"><span class="SHKeyword">private const</span> <span class="SHKeyword">int</span> DefaultUpdateInterval</div>
 </div>
 
-<a name="Variables"></a><a name="Topic146"></a><div class="CTopic TGroup LCSharp">
+<a name="DefaultPausedUpdateInterval"></a><a name="Topic574"></a><div class="CTopic TConstant LCSharp">
+ <div class="CTitle">DefaultPausedUpdateInterval</div>
+ <div id="NDPrototype574" class="NDPrototype NoParameterForm"><span class="SHKeyword">private const</span> <span class="SHKeyword">int</span> DefaultPausedUpdateInterval</div>
+</div>
+
+<a name="Variables"></a><a name="Topic575"></a><div class="CTopic TGroup LCSharp">
  <div class="CTitle">Variables</div>
 </div>
 
-<a name="_updateTimer"></a><a name="Topic147"></a><div class="CTopic TVariable LCSharp">
+<a name="updateInterval"></a><a name="Topic576"></a><div class="CTopic TVariable LCSharp">
+ <div class="CTitle">updateInterval</div>
+ <div id="NDPrototype576" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">int</span> updateInterval</div>
+</div>
+
+<a name="pausedUpdateInterval"></a><a name="Topic577"></a><div class="CTopic TVariable LCSharp">
+ <div class="CTitle">pausedUpdateInterval</div>
+ <div id="NDPrototype577" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">int</span> pausedUpdateInterval</div>
+</div>
+
+<a name="_updateTimer"></a><a name="Topic578"></a><div class="CTopic TVariable LCSharp">
  <div class="CTitle">_updateTimer</div>
- <div id="NDPrototype147" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> Timer _updateTimer</div>
+ <div id="NDPrototype578" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> Timer _updateTimer</div>
 </div>
 
-<a name="lastTime"></a><a name="Topic148"></a><div class="CTopic TVariable LCSharp">
+<a name="lastTime"></a><a name="Topic579"></a><div class="CTopic TVariable LCSharp">
  <div class="CTitle">lastTime</div>
- <div id="NDPrototype148" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">uint</span> lastTime</div>
+ <div id="NDPrototype579" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">uint</span> lastTime</div>
 </div>
 
-<a name="Functions"></a><a name="Topic272"></a><div class="CTopic TGroup LCSharp">
+<a name="Functions"></a><a name="Topic580"></a><div class="CTopic TGroup LCSharp">
  <div class="CTitle">Functions</div>
 </div>
 
-<a name="Dispose"></a><a name="Topic394"></a><div class="CTopic TFunction LCSharp">
+<a name="Dispose"></a><a name="Topic581"></a><div class="CTopic TFunction LCSharp">
  <div class="CTitle">Dispose</div>
- <div id="NDPrototype394" class="NDPrototype NoParameterForm"><span class="SHKeyword">public</span> <span class="SHKeyword">void</span> Dispose()</div>
+ <div id="NDPrototype581" class="NDPrototype NoParameterForm"><span class="SHKeyword">public</span> <span class="SHKeyword">void</span> Dispose()</div>
 </div>
 
-<a name="Dispose(2)"></a><a name="Topic278"></a><div class="CTopic TFunction LCSharp">
+<a name="Dispose(2)"></a><a name="Topic582"></a><div class="CTopic TFunction LCSharp">
  <div class="CTitle">Dispose</div>
- <div id="NDPrototype278" class="NDPrototype NoParameterForm"><span class="SHKeyword">public</span> <span class="SHKeyword">void</span> Dispose()</div>
+ <div id="NDPrototype582" class="NDPrototype NoParameterForm"><span class="SHKeyword">public</span> <span class="SHKeyword">void</span> Dispose()</div>
 </div>
 
-<a name="Variables(2)"></a><a name="Topic395"></a><div class="CTopic TGroup LCSharp">
+<a name="Variables(2)"></a><a name="Topic583"></a><div class="CTopic TGroup LCSharp">
  <div class="CTitle">Variables</div>
 </div>
 
-<a name="SharedMemory"></a><a name="Topic149"></a><div class="CTopic TVariable LCSharp">
+<a name="SharedMemory"></a><a name="Topic584"></a><div class="CTopic TVariable LCSharp">
  <div class="CTitle">SharedMemory</div>
- <div id="NDPrototype149" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <a href="../../../index.html#CSharpClass:SCSSdkClient.SharedMemory" target="_top" onmouseover="NDContentPage.OnLinkMouseOver(event,527);" onmouseout="NDContentPage.OnLinkMouseOut(event);" >SharedMemory</a> SharedMemory</div>
+ <div id="NDPrototype584" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <a href="../../../index.html#CSharpClass:SCSSdkClient.SharedMemory" target="_top" onmouseover="NDContentPage.OnLinkMouseOver(event,734);" onmouseout="NDContentPage.OnLinkMouseOut(event);" >SharedMemory</a> SharedMemory</div>
 </div>
 
-<a name="wasFinishingJob"></a><a name="Topic150"></a><div class="CTopic TVariable LCSharp">
+<a name="wasFinishingJob"></a><a name="Topic585"></a><div class="CTopic TVariable LCSharp">
  <div class="CTitle">wasFinishingJob</div>
- <div id="NDPrototype150" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> wasFinishingJob</div>
+ <div id="NDPrototype585" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> wasFinishingJob</div>
 </div>
 
-<a name="wasOnJob"></a><a name="Topic151"></a><div class="CTopic TVariable LCSharp">
+<a name="wasOnJob"></a><a name="Topic586"></a><div class="CTopic TVariable LCSharp">
  <div class="CTitle">wasOnJob</div>
- <div id="NDPrototype151" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> wasOnJob</div>
+ <div id="NDPrototype586" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> wasOnJob</div>
 </div>
 
-<a name="wasConnected"></a><a name="Topic280"></a><div class="CTopic TVariable LCSharp">
+<a name="wasConnected"></a><a name="Topic587"></a><div class="CTopic TVariable LCSharp">
  <div class="CTitle">wasConnected</div>
- <div id="NDPrototype280" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> wasConnected</div>
+ <div id="NDPrototype587" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> wasConnected</div>
 </div>
 
-<a name="cancelled"></a><a name="Topic379"></a><div class="CTopic TVariable LCSharp">
+<a name="cancelled"></a><a name="Topic588"></a><div class="CTopic TVariable LCSharp">
  <div class="CTitle">cancelled</div>
- <div id="NDPrototype379" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> cancelled</div>
+ <div id="NDPrototype588" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> cancelled</div>
 </div>
 
-<a name="delivered"></a><a name="Topic724"></a><div class="CTopic TVariable LCSharp">
+<a name="delivered"></a><a name="Topic589"></a><div class="CTopic TVariable LCSharp">
  <div class="CTitle">delivered</div>
- <div id="NDPrototype724" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> delivered</div>
+ <div id="NDPrototype589" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> delivered</div>
 </div>
 
-<a name="fined"></a><a name="Topic725"></a><div class="CTopic TVariable LCSharp">
+<a name="fined"></a><a name="Topic590"></a><div class="CTopic TVariable LCSharp">
  <div class="CTitle">fined</div>
- <div id="NDPrototype725" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> fined</div>
+ <div id="NDPrototype590" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> fined</div>
 </div>
 
-<a name="tollgate"></a><a name="Topic726"></a><div class="CTopic TVariable LCSharp">
+<a name="tollgate"></a><a name="Topic591"></a><div class="CTopic TVariable LCSharp">
  <div class="CTitle">tollgate</div>
- <div id="NDPrototype726" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> tollgate</div>
+ <div id="NDPrototype591" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> tollgate</div>
 </div>
 
-<a name="ferry"></a><a name="Topic727"></a><div class="CTopic TVariable LCSharp">
+<a name="ferry"></a><a name="Topic592"></a><div class="CTopic TVariable LCSharp">
  <div class="CTitle">ferry</div>
- <div id="NDPrototype727" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> ferry</div>
+ <div id="NDPrototype592" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> ferry</div>
 </div>
 
-<a name="train"></a><a name="Topic728"></a><div class="CTopic TVariable LCSharp">
+<a name="train"></a><a name="Topic593"></a><div class="CTopic TVariable LCSharp">
  <div class="CTitle">train</div>
- <div id="NDPrototype728" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> train</div>
+ <div id="NDPrototype593" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> train</div>
 </div>
 
-<a name="Properties"></a><a name="Topic152"></a><div class="CTopic TGroup LCSharp">
+<a name="paused"></a><a name="Topic594"></a><div class="CTopic TVariable LCSharp">
+ <div class="CTitle">paused</div>
+ <div id="NDPrototype594" class="NDPrototype NoParameterForm"><span class="SHKeyword">private</span> <span class="SHKeyword">bool</span> paused</div>
+</div>
+
+<a name="Properties"></a><a name="Topic595"></a><div class="CTopic TGroup LCSharp">
  <div class="CTitle">Properties</div>
 </div>
 
-<a name="Map"></a><a name="Topic153"></a><div class="CTopic TProperty LCSharp">
+<a name="Map"></a><a name="Topic596"></a><div class="CTopic TProperty LCSharp">
  <div class="CTitle">Map</div>
- <div id="NDPrototype153" class="NDPrototype NoParameterForm"><span class="SHKeyword">public</span> <span class="SHKeyword">string</span> Map { <span class="SHKeyword">get</span>; <span class="SHKeyword">private set</span> }</div>
+ <div id="NDPrototype596" class="NDPrototype NoParameterForm"><span class="SHKeyword">public</span> <span class="SHKeyword">string</span> Map { <span class="SHKeyword">get</span>; <span class="SHKeyword">private set</span> }</div>
 </div>
 
-<a name="UpdateInterval"></a><a name="Topic154"></a><div class="CTopic TProperty LCSharp">
+<a name="UpdateInterval"></a><a name="Topic597"></a><div class="CTopic TProperty LCSharp">
  <div class="CTitle">UpdateInterval</div>
- <div id="NDPrototype154" class="NDPrototype NoParameterForm"><span class="SHKeyword">public</span> <span class="SHKeyword">int</span> UpdateInterval { <span class="SHKeyword">get</span>; <span class="SHKeyword">private set</span> }</div>
+ <div id="NDPrototype597" class="NDPrototype NoParameterForm"><span class="SHKeyword">public</span> <span class="SHKeyword">int</span> UpdateInterval { <span class="SHKeyword">get</span> }</div>
 </div>
 
-<a name="Error"></a><a name="Topic155"></a><div class="CTopic TProperty LCSharp">
+<a name="Error"></a><a name="Topic598"></a><div class="CTopic TProperty LCSharp">
  <div class="CTitle">Error</div>
- <div id="NDPrototype155" class="NDPrototype NoParameterForm"><span class="SHKeyword">public</span> Exception Error { <span class="SHKeyword">get</span>; <span class="SHKeyword">private set</span> }</div>
+ <div id="NDPrototype598" class="NDPrototype NoParameterForm"><span class="SHKeyword">public</span> Exception Error { <span class="SHKeyword">get</span>; <span class="SHKeyword">private set</span> }</div>
 </div>
 
-<a name="Events"></a><a name="Topic156"></a><div class="CTopic TGroup LCSharp">
+<a name="Events"></a><a name="Topic599"></a><div class="CTopic TGroup LCSharp">
  <div class="CTitle">Events</div>
 </div>
 
-<a name="Data"></a><a name="Topic269"></a><div class="CTopic TEvent LCSharp">
+<a name="Data"></a><a name="Topic600"></a><div class="CTopic TEvent LCSharp">
  <div class="CTitle">Data</div>
- <div id="NDPrototype269" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> <a href="../../../index.html#File:SCSSdkTelemetry.cs:SCSSdkClient.TelemetryData" target="_top" onmouseover="NDContentPage.OnLinkMouseOver(event,141);" onmouseout="NDContentPage.OnLinkMouseOut(event);" >TelemetryData</a> Data</div>
+ <div id="NDPrototype600" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> <a href="../../../index.html#File:SCSSdkTelemetry.cs:SCSSdkClient.TelemetryData" target="_top" onmouseover="NDContentPage.OnLinkMouseOver(event,569);" onmouseout="NDContentPage.OnLinkMouseOut(event);" >TelemetryData</a> Data</div>
 </div>
 
-<a name="JobStarted"></a><a name="Topic270"></a><div class="CTopic TEvent LCSharp">
+<a name="JobStarted"></a><a name="Topic601"></a><div class="CTopic TEvent LCSharp">
  <div class="CTitle">JobStarted</div>
- <div id="NDPrototype270" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler JobStarted</div>
+ <div id="NDPrototype601" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler JobStarted</div>
 </div>
 
-<a name="JobFinished"></a><a name="Topic271"></a><div class="CTopic TEvent LCSharp">
+<a name="JobFinished"></a><a name="Topic602"></a><div class="CTopic TEvent LCSharp">
  <div class="CTitle">JobFinished</div>
- <div id="NDPrototype271" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler JobFinished</div>
+ <div id="NDPrototype602" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler JobFinished</div>
 </div>
 
-<a name="JobCancelled"></a><a name="Topic729"></a><div class="CTopic TEvent LCSharp">
+<a name="JobCancelled"></a><a name="Topic603"></a><div class="CTopic TEvent LCSharp">
  <div class="CTitle">JobCancelled</div>
- <div id="NDPrototype729" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler JobCancelled</div>
+ <div id="NDPrototype603" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler JobCancelled</div>
 </div>
 
-<a name="JobDelivered"></a><a name="Topic730"></a><div class="CTopic TEvent LCSharp">
+<a name="JobDelivered"></a><a name="Topic604"></a><div class="CTopic TEvent LCSharp">
  <div class="CTitle">JobDelivered</div>
- <div id="NDPrototype730" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler JobDelivered</div>
+ <div id="NDPrototype604" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler JobDelivered</div>
 </div>
 
-<a name="Fined"></a><a name="Topic731"></a><div class="CTopic TEvent LCSharp">
+<a name="Fined"></a><a name="Topic605"></a><div class="CTopic TEvent LCSharp">
  <div class="CTitle">Fined</div>
- <div id="NDPrototype731" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler Fined</div>
+ <div id="NDPrototype605" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler Fined</div>
 </div>
 
-<a name="Tollgate"></a><a name="Topic732"></a><div class="CTopic TEvent LCSharp">
+<a name="Tollgate"></a><a name="Topic606"></a><div class="CTopic TEvent LCSharp">
  <div class="CTitle">Tollgate</div>
- <div id="NDPrototype732" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler Tollgate</div>
+ <div id="NDPrototype606" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler Tollgate</div>
 </div>
 
-<a name="Ferry"></a><a name="Topic733"></a><div class="CTopic TEvent LCSharp">
+<a name="Ferry"></a><a name="Topic607"></a><div class="CTopic TEvent LCSharp">
  <div class="CTitle">Ferry</div>
- <div id="NDPrototype733" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler Ferry</div>
+ <div id="NDPrototype607" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler Ferry</div>
 </div>
 
-<a name="Train"></a><a name="Topic734"></a><div class="CTopic TEvent LCSharp">
+<a name="Train"></a><a name="Topic608"></a><div class="CTopic TEvent LCSharp">
  <div class="CTitle">Train</div>
- <div id="NDPrototype734" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler Train</div>
+ <div id="NDPrototype608" class="NDPrototype NoParameterForm"><span class="SHKeyword">public event</span> EventHandler Train</div>
 </div>
 
-<a name="Functions(2)"></a><a name="Topic396"></a><div class="CTopic TGroup LCSharp">
+<a name="Functions(2)"></a><a name="Topic609"></a><div class="CTopic TGroup LCSharp">
  <div class="CTitle">Functions</div>
 </div>
 
-<a name="pause"></a><a name="Topic284"></a><div class="CTopic TFunction LCSharp">
+<a name="pause"></a><a name="Topic610"></a><div class="CTopic TFunction LCSharp">
  <div class="CTitle">pause</div>
- <div id="NDPrototype284" class="NDPrototype NoParameterForm"><span class="SHKeyword">public</span> <span class="SHKeyword">void</span> pause()</div>
+ <div id="NDPrototype610" class="NDPrototype NoParameterForm"><span class="SHKeyword">public</span> <span class="SHKeyword">void</span> pause()</div>
 </div>
 
-<a name="resume"></a><a name="Topic286"></a><div class="CTopic TFunction LCSharp">
+<a name="resume"></a><a name="Topic611"></a><div class="CTopic TFunction LCSharp">
  <div class="CTitle">resume</div>
- <div id="NDPrototype286" class="NDPrototype NoParameterForm"><span class="SHKeyword">public</span> <span class="SHKeyword">void</span> resume()</div>
+ <div id="NDPrototype611" class="NDPrototype NoParameterForm"><span class="SHKeyword">public</span> <span class="SHKeyword">void</span> resume()</div>
 </div>
 
-<a name="Setup"></a><a name="Topic273"></a><div class="CTopic TFunction LCSharp">
+<a name="Setup"></a><a name="Topic612"></a><div class="CTopic TFunction LCSharp">
  <div class="CTitle">Setup</div>
- <div id="NDPrototype273" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">private</span> <span class="SHKeyword">void</span> Setup(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PType first"><span class="SHKeyword">string</span>&nbsp;</td><td class="PName last">map,</td></tr><tr><td class="PType first"><span class="SHKeyword">int</span>&nbsp;</td><td class="PName last">interval</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div id="NDPrototype612" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">private</span> <span class="SHKeyword">void</span> Setup(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PType first"><span class="SHKeyword">string</span>&nbsp;</td><td class="PName last">map,</td></tr><tr><td class="PType first"><span class="SHKeyword">int</span>&nbsp;</td><td class="PName last">interval</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
  <div class="CBody"><p>Set up SCS telemetry provider.&nbsp; Connects to shared memory map, sets up timebase.</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">map<div class="CDLParameterType"><span class="SHKeyword">string</span></div></td><td class="CDLDefinition"><p>Memory Map location</p></td></tr><tr><td class="CDLEntry">interval<div class="CDLParameterType"><span class="SHKeyword">int</span></div></td><td class="CDLDefinition"><p>Timebase interval</p></td></tr></table></div>
 </div>
 
-<a name="_updateTimer_Elapsed"></a><a name="Topic274"></a><div class="CTopic TFunction LCSharp">
+<a name="_updateTimer_Elapsed"></a><a name="Topic613"></a><div class="CTopic TFunction LCSharp">
  <div class="CTitle">_updateTimer_Elapsed</div>
- <div id="NDPrototype274" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">private</span> <span class="SHKeyword">void</span> _updateTimer_Elapsed(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PType first"><span class="SHKeyword">object</span>&nbsp;</td><td class="PName last">sender</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div id="NDPrototype613" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">private</span> <span class="SHKeyword">void</span> _updateTimer_Elapsed(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PType first"><span class="SHKeyword">object</span>&nbsp;</td><td class="PName last">sender</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
 </div>
 
-<a name="CurrentDomain_UnhandledException"></a><a name="Topic287"></a><div class="CTopic TFunction LCSharp last">
+<a name="CurrentDomain_UnhandledException"></a><a name="Topic614"></a><div class="CTopic TFunction LCSharp last">
  <div class="CTitle">CurrentDomain_UnhandledException</div>
- <div id="NDPrototype287" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">private static</span> <span class="SHKeyword">void</span> CurrentDomain_UnhandledException(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PType first"><span class="SHKeyword">object</span>&nbsp;</td><td class="PName last">sender,</td></tr><tr><td class="PType first">UnhandledExceptionEventArgs&nbsp;</td><td class="PName last">e</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div id="NDPrototype614" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">private static</span> <span class="SHKeyword">void</span> CurrentDomain_UnhandledException(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PType first"><span class="SHKeyword">object</span>&nbsp;</td><td class="PName last">sender,</td></tr><tr><td class="PType first">UnhandledExceptionEventArgs&nbsp;</td><td class="PName last">e</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
 </div>
 
 </body></html>

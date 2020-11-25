@@ -44,8 +44,14 @@ namespace SCSSdkClient {
 
             #region FIRST ZONE 
 
-            retData.Timestamp = GetUint();
+            retData.SdkActive = GetBool();
+            GetBoolArray(3);
             retData.Paused = GetBool();
+            GetBoolArray(3);
+            retData.Timestamp = GetULong();
+            retData.SimulationTimestamp = GetULong();
+            retData.RenderTimestamp = GetULong();
+
 
 
             NextOffsetArea();
@@ -61,15 +67,16 @@ namespace SCSSdkClient {
             retData.TelemetryVersion.Major = GetUint();
             retData.TelemetryVersion.Minor = GetUint();
 
-            retData.SetGameTime(GetUint());
+            retData.CommonValues.GameTime = GetUint();
             retData.TruckValues.ConstantsValues.MotorValues.ForwardGearCount = GetUint();
             retData.TruckValues.ConstantsValues.MotorValues.ReverseGearCount = GetUint();
             retData.TruckValues.ConstantsValues.MotorValues.RetarderStepCount = GetUint();
             retData.TruckValues.ConstantsValues.WheelsValues.Count = GetUint();
             retData.TruckValues.ConstantsValues.MotorValues.SelectorCount = GetUint();
-            retData.JobValues.DeliveryTime = GetUint();
+            retData.SetDeliveryTime(GetUint());
             retData.MaxTrailerCount = GetUint();
             retData.JobValues.CargoValues.UnitCount = GetUint();
+            retData.JobValues.PlannedDistanceKm = GetUint();
 
 
             retData.TruckValues.CurrentValues.MotorValues.GearValues.HShifterSlot = GetUint();
@@ -82,6 +89,12 @@ namespace SCSSdkClient {
             retData.TruckValues.ConstantsValues.MotorValues.SlotSelectors = GetUintArray(32);
 
             retData.GamePlay.JobDelivered.DeliveryTime = GetUint();
+            var jobStartingTime = new SCSTelemetry.Time(GetUint());
+            retData.GamePlay.JobCancelled.Started = jobStartingTime;
+            retData.GamePlay.JobDelivered.Started = jobStartingTime;
+            var jobFinishingTime = new SCSTelemetry.Time(GetUint());
+            retData.GamePlay.JobCancelled.Finished = jobFinishingTime;
+            retData.GamePlay.JobDelivered.Finished = jobFinishingTime;
 
             NextOffsetArea();
 
@@ -150,7 +163,7 @@ namespace SCSSdkClient {
             retData.TruckValues.CurrentValues.DamageValues.Chassis = GetFloat();
             retData.TruckValues.CurrentValues.DamageValues.WheelsAvg = GetFloat();
 
-
+       
             retData.TruckValues.CurrentValues.DashboardValues.Odometer = GetFloat();
             retData.NavigationValues.NavigationDistance = GetFloat();
             retData.NavigationValues.NavigationTime = GetFloat();
@@ -162,8 +175,10 @@ namespace SCSSdkClient {
             retData.TruckValues.CurrentValues.WheelsValues.Lift = GetFloatArray(WheelSize);
             retData.TruckValues.CurrentValues.WheelsValues.LiftOffset = GetFloatArray(WheelSize);
 
-            retData.GamePlay.JobDelivered.CargoCamage = GetFloat();
+            retData.GamePlay.JobDelivered.CargoDamage = GetFloat();
             retData.GamePlay.JobDelivered.DistanceKm = GetFloat();
+
+            retData.GamePlay.RefuelEvent.Amount = GetFloat();
 
             retData.JobValues.CargoValues.CargoDamage = GetFloat();
 
@@ -296,7 +311,7 @@ namespace SCSSdkClient {
                 retData.JobValues.Market = tempJobMarket.ToEnum<JobMarket>();
             }
 
-            var tempfineOffence = GetString(16);
+            var tempfineOffence = GetString(32);
             if (tempfineOffence?.Length > 0) {
                 retData.GamePlay.FinedEvent.Offence = tempfineOffence.ToEnum<Offence>();
             }
@@ -341,12 +356,15 @@ namespace SCSSdkClient {
             retData.SpecialEventsValues.OnJob = GetBool();
             retData.SpecialEventsValues.JobFinished = GetBool();
 
-            retData.SpecialEventsValues.JobCancelled = GetBool();
+            retData.SpecialEventsValues.JobCancelled = GetBool(); 
             retData.SpecialEventsValues.JobDelivered = GetBool();
             retData.SpecialEventsValues.Fined = GetBool();
             retData.SpecialEventsValues.Tollgate = GetBool();
             retData.SpecialEventsValues.Ferry = GetBool();
             retData.SpecialEventsValues.Train = GetBool();
+
+            retData.SpecialEventsValues.Refuel = GetBool();
+            retData.SpecialEventsValues.RefuelPayed = GetBool();
 
             NextOffsetArea();
 

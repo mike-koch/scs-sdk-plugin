@@ -31,7 +31,10 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SCSSdkClientDemo));
             this.hgf = new System.Windows.Forms.TabControl();
             this.tabAbout = new SCSSdkClient.Demo.CustomTabPage();
-            this.label1 = new System.Windows.Forms.Label();
+            this.rtb_fuel = new System.Windows.Forms.RichTextBox();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.l_updateRate = new System.Windows.Forms.ToolStripStatusLabel();
             this.lbGeneral = new System.Windows.Forms.RichTextBox();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.lblDemo = new System.Windows.Forms.Label();
@@ -53,6 +56,7 @@
             this.gameplayevent = new System.Windows.Forms.RichTextBox();
             this.hgf.SuspendLayout();
             this.tabAbout.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
@@ -83,7 +87,8 @@
             // 
             // tabAbout
             // 
-            this.tabAbout.Controls.Add(this.label1);
+            this.tabAbout.Controls.Add(this.rtb_fuel);
+            this.tabAbout.Controls.Add(this.statusStrip1);
             this.tabAbout.Controls.Add(this.lbGeneral);
             this.tabAbout.Controls.Add(this.richTextBox1);
             this.tabAbout.Controls.Add(this.lblDemo);
@@ -95,17 +100,43 @@
             this.tabAbout.Text = "About";
             this.tabAbout.UseVisualStyleBackColor = true;
             // 
-            // label1
+            // rtb_fuel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(30, 191);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "label1";
+            this.rtb_fuel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rtb_fuel.Location = new System.Drawing.Point(20, 512);
+            this.rtb_fuel.Name = "rtb_fuel";
+            this.rtb_fuel.Size = new System.Drawing.Size(549, 36);
+            this.rtb_fuel.TabIndex = 4;
+            this.rtb_fuel.Text = "";
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel1,
+            this.l_updateRate});
+            this.statusStrip1.Location = new System.Drawing.Point(3, 570);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(581, 22);
+            this.statusStrip1.TabIndex = 3;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(113, 17);
+            this.toolStripStatusLabel1.Text = "Current update rate:";
+            // 
+            // l_updateRate
+            // 
+            this.l_updateRate.Name = "l_updateRate";
+            this.l_updateRate.Size = new System.Drawing.Size(0, 17);
             // 
             // lbGeneral
             // 
+            this.lbGeneral.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lbGeneral.Location = new System.Drawing.Point(20, 210);
             this.lbGeneral.Name = "lbGeneral";
             this.lbGeneral.Size = new System.Drawing.Size(549, 295);
@@ -302,6 +333,8 @@
             this.hgf.ResumeLayout(false);
             this.tabAbout.ResumeLayout(false);
             this.tabAbout.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
@@ -335,9 +368,12 @@
         private System.Windows.Forms.RichTextBox navigation;
         private System.Windows.Forms.TabPage tabPage7;
         private System.Windows.Forms.RichTextBox substances;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TabPage tabPage8;
         private System.Windows.Forms.RichTextBox gameplayevent;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ToolStripStatusLabel l_updateRate;
+        private System.Windows.Forms.RichTextBox rtb_fuel;
     }
 }
 

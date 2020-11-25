@@ -2,7 +2,7 @@
 using System.Threading;
 using SCSSdkClient.Object;
 
-//TODO: possible idea: check if ets is running and if not change updaterate to infinity (why most of the user may not quit the application while ets is running)
+//TODO: possible idea: check if ets is running and if not change update rate to infinity (why most of the user may not quit the application while ets is running)
 namespace SCSSdkClient {
     public delegate void TelemetryData(SCSTelemetry data, bool newTimestamp);
 
@@ -11,12 +11,18 @@ namespace SCSSdkClient {
     ///     Currently IDisposable. Was implemented because of an error
     /// </summary>
     public class SCSSdkTelemetry : IDisposable {
-        private const string DefaultSharedMemoryMap = "Local\\SimTelemetrySCS";
-        private const int DefaultUpdateInterval = 25;
+        private const string DefaultSharedMemoryMap = "Local\\SCSTelemetry";
+        private const int DefaultUpdateInterval = 100;
+        private const int DefaultPausedUpdateInterval = 1000;
+
+        private int updateInterval;
+
+        // todo: enhancement:  some way to set this value 
+        private readonly int pausedUpdateInterval = DefaultPausedUpdateInterval;
 
         private Timer _updateTimer;
 
-        private uint lastTime = 0xFFFFFFFF;
+        private ulong lastTime = 0xFFFFFFFFFFFFFFFF;
 
 
 #if LOGGING
@@ -31,7 +37,6 @@ namespace SCSSdkClient {
 
 
         private SharedMemory SharedMemory;
-        private bool wasFinishingJob;
 
         private bool wasOnJob;
         private bool wasConnected;
@@ -41,7 +46,10 @@ namespace SCSSdkClient {
         private bool tollgate;
         private bool ferry;
         private bool train;
-
+        private bool paused;
+        private bool refuel;
+        private bool refuelPayed;
+        private bool wasPaused;
 
         public SCSSdkTelemetry() => Setup(DefaultSharedMemoryMap, DefaultUpdateInterval);
 
@@ -52,19 +60,23 @@ namespace SCSSdkClient {
         public SCSSdkTelemetry(string map, int interval) => Setup(map, interval);
 
         public string Map { get; private set; }
-        public int UpdateInterval { get; private set; }
+        public int UpdateInterval => paused ? pausedUpdateInterval : updateInterval;
+
+
         public Exception Error { get; private set; }
 
         public event TelemetryData Data;
 
         public event EventHandler JobStarted;
-        public event EventHandler JobFinished;
         public event EventHandler JobCancelled;
         public event EventHandler JobDelivered;
         public event EventHandler Fined;
         public event EventHandler Tollgate;
         public event EventHandler Ferry;
         public event EventHandler Train;
+        public event EventHandler RefuelStart;
+        public event EventHandler RefuelEnd;
+        public event EventHandler RefuelPayed;
 
         public void pause() => _updateTimer.Change(Timeout.Infinite, Timeout.Infinite);
 
@@ -87,7 +99,7 @@ namespace SCSSdkClient {
 #endif
 
             Map = map;
-            UpdateInterval = interval;
+            updateInterval = interval;
 
             SharedMemory = new SharedMemory();
             SharedMemory.Connect(map);
@@ -107,69 +119,130 @@ namespace SCSSdkClient {
 
         private void _updateTimer_Elapsed(object sender) {
             var scsTelemetry = SharedMemory.Update<SCSTelemetry>();
-            var time = scsTelemetry.Timestamp;
-            Data?.Invoke(scsTelemetry, time != lastTime);
-            //TODO: make it nicer thats a lot of code for such less work
-            // Job close & start events
-            if (wasFinishingJob != scsTelemetry.SpecialEventsValues.JobFinished) {
-                wasFinishingJob = scsTelemetry.SpecialEventsValues.JobFinished;
-                if (scsTelemetry.SpecialEventsValues.JobFinished) {
-                    JobFinished?.Invoke(this, new EventArgs());
-                }
+            // check if sdk is NOT running
+            if (!scsTelemetry.SdkActive && !paused) {
+                // if so don't check so often the data 
+                var tsInterval = new TimeSpan(0, 0, 0, 0, DefaultPausedUpdateInterval);
+                _updateTimer.Change(tsInterval.Add(tsInterval), tsInterval);
+                paused = true;
+                // if sdk not active we don't need to do something
+                return;
             }
 
+            if (paused && scsTelemetry.SdkActive) {
+                // ok sdk is active now
+                paused = false;
+                resume(); // going back to normal update rate
+            }
+
+            var time = scsTelemetry.Timestamp;
+            var updated = false;
+            if (time != lastTime || wasPaused != scsTelemetry.Paused) {
+                // time changed or game state change -> update data
+                Data?.Invoke(scsTelemetry, true);
+                wasPaused = scsTelemetry.Paused;
+                lastTime = time;
+                updated = true;
+            }
+
+            //TODO: make it nicer thats a lot of code for such less work
+            // Job start event
             if (wasOnJob != scsTelemetry.SpecialEventsValues.OnJob) {
                 wasOnJob = scsTelemetry.SpecialEventsValues.OnJob;
-                if (scsTelemetry.SpecialEventsValues.OnJob) {
+                if (wasOnJob) {
+                    if (!updated) {
+                        Data?.Invoke(scsTelemetry, true);
+                        updated = true;
+                    }
+
                     JobStarted?.Invoke(this, new EventArgs());
                 }
             }
 
-
             if (cancelled != scsTelemetry.SpecialEventsValues.JobCancelled) {
                 cancelled = scsTelemetry.SpecialEventsValues.JobCancelled;
-                if (scsTelemetry.SpecialEventsValues.JobCancelled) {
+                if (cancelled) {
+                    if (!updated) {
+                        Data?.Invoke(scsTelemetry, true);
+                        updated = true;
+                    }
+
                     JobCancelled?.Invoke(this, new EventArgs());
                 }
             }
 
             if (delivered != scsTelemetry.SpecialEventsValues.JobDelivered) {
                 delivered = scsTelemetry.SpecialEventsValues.JobDelivered;
-                if (scsTelemetry.SpecialEventsValues.JobDelivered) {
+                if (delivered) {
+                    if (!updated) {
+                        Data?.Invoke(scsTelemetry, true);
+                        updated = true;
+                    }
+
                     JobDelivered?.Invoke(this, new EventArgs());
                 }
             }
 
             if (fined != scsTelemetry.SpecialEventsValues.Fined) {
                 fined = scsTelemetry.SpecialEventsValues.Fined;
-                if (scsTelemetry.SpecialEventsValues.Fined) {
+                if (fined) {
                     Fined?.Invoke(this, new EventArgs());
                 }
             }
 
             if (tollgate != scsTelemetry.SpecialEventsValues.Tollgate) {
                 tollgate = scsTelemetry.SpecialEventsValues.Tollgate;
-                if (scsTelemetry.SpecialEventsValues.Tollgate) {
+                if (tollgate) {
                     Tollgate?.Invoke(this, new EventArgs());
                 }
             }
 
             if (ferry != scsTelemetry.SpecialEventsValues.Ferry) {
                 ferry = scsTelemetry.SpecialEventsValues.Ferry;
-                if (scsTelemetry.SpecialEventsValues.Ferry) {
+                if (ferry) {
+                    if (!updated) {
+                        Data?.Invoke(scsTelemetry, true);
+                        updated = true;
+                    }
+
                     Ferry?.Invoke(this, new EventArgs());
                 }
             }
 
             if (train != scsTelemetry.SpecialEventsValues.Train) {
                 train = scsTelemetry.SpecialEventsValues.Train;
-                if (scsTelemetry.SpecialEventsValues.Train) {
+                if (train) {
+                    if (!updated) {
+                        Data?.Invoke(scsTelemetry, true);
+                        updated = true;
+                    }
+
                     Train?.Invoke(this, new EventArgs());
                 }
             }
 
+            if (refuel != scsTelemetry.SpecialEventsValues.Refuel) {
+                refuel = scsTelemetry.SpecialEventsValues.Refuel;
+                if (scsTelemetry.SpecialEventsValues.Refuel) {
+                    RefuelStart?.Invoke(this, new EventArgs());
+                } else {
+                    RefuelEnd?.Invoke(this, new EventArgs());
+                }
+            }
 
-            lastTime = time;
+            if (refuelPayed != scsTelemetry.SpecialEventsValues.RefuelPayed) {
+                refuelPayed = scsTelemetry.SpecialEventsValues.RefuelPayed;
+                if (scsTelemetry.SpecialEventsValues.RefuelPayed) {
+                    RefuelPayed?.Invoke(this, new EventArgs());
+                }
+            }
+
+            // currently the design is that the event is called, doesn't matter if data changed
+            // also the old demo didn't used the flag and expected to be refreshed each call
+            // so without making a big change also call the event without update with false flag
+            if (!updated) {
+                Data?.Invoke(scsTelemetry, false);
+            }
         }
 #if LOGGING
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
